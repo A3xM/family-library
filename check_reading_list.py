@@ -36,7 +36,24 @@ from difflib import SequenceMatcher
 import requests
 import anthropic
 
-# ── Конфигурация (из env — для Railway/Render; фоллбек на хардкод для локальной разработки)
+# ── Загрузка .env ДО всего остального ────────────────────────────────────────
+def _load_env_file_early() -> None:
+    env_file = Path(__file__).parent / ".env"
+    if not env_file.exists():
+        return
+    for line in env_file.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, _, val = line.partition("=")
+        key = key.strip()
+        val = val.strip().strip('"').strip("'")
+        if key and val:
+            os.environ[key] = val   # .env всегда перекрывает shell
+
+_load_env_file_early()
+
+# ── Конфигурация (из env — для Railway/Render и локальной разработки через .env)
 
 NOTION_TOKEN  = os.environ.get("NOTION_TOKEN",  "")
 NOTION_DB_ID  = os.environ.get("NOTION_DB_ID",  "")
@@ -53,22 +70,7 @@ FUZZY_THRESHOLD = 0.72
 VISION_MODEL    = "claude-opus-4-5"
 
 
-def _load_env_key() -> str:
-    """Load ANTHROPIC_API_KEY from .env file if not set in environment."""
-    env_file = Path(__file__).parent / ".env"
-    if not env_file.exists():
-        return ""
-    for line in env_file.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
-        if line.startswith("ANTHROPIC_API_KEY="):
-            return line.split("=", 1)[1].strip().strip('"').strip("'")
-    return ""
-
-
-# Ensure API key is available — set even if env var exists but is empty
-_api_key = os.environ.get("ANTHROPIC_API_KEY") or _load_env_key()
-if _api_key:
-    os.environ["ANTHROPIC_API_KEY"] = _api_key
+_api_key = os.environ.get("ANTHROPIC_API_KEY", "")
 
 
 # ── Шаг 0: конвертация HEIC → JPEG ───────────────────────────────────────────
