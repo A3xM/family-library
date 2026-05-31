@@ -1,0 +1,16 @@
+# Секреты
+.env
+
+# macOS-бинарники (не нужны на Linux/Railway)
+vision_ocr
+
+# Локальные данные
+.sprint_db_id
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+
+# Временные файлы
+*.tmp
+*.log

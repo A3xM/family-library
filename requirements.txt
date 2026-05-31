@@ -1,0 +1,5 @@
+anthropic>=0.104.1
+requests>=2.34.2
+fastapi[standard]>=0.115.0
+uvicorn>=0.34.0
+python-multipart>=0.0.9
