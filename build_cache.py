@@ -16,6 +16,7 @@
 """
 
 import json
+import os
 import sys
 import argparse
 from datetime import datetime, timezone
@@ -25,8 +26,19 @@ import requests
 
 # ── Конфиг ────────────────────────────────────────────────────────────────────
 
-NOTION_TOKEN = "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"
-NOTION_DB_ID = "9fc436dc-5815-43e9-8f26-1952efc1a48d"
+def _load_env():
+    env_path = Path(__file__).parent / ".env"
+    if env_path.exists():
+        for line in env_path.read_text().splitlines():
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                k, v = line.split("=", 1)
+                os.environ.setdefault(k.strip(), v.strip())
+
+_load_env()
+
+NOTION_TOKEN = os.environ.get("NOTION_TOKEN", "")
+NOTION_DB_ID = os.environ.get("NOTION_DB_ID", "9fc436dc-5815-43e9-8f26-1952efc1a48d")
 NOTION_HEADERS = {
     "Authorization":  f"Bearer {NOTION_TOKEN}",
     "Notion-Version": "2022-06-28",
