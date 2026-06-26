@@ -115,9 +115,11 @@ def api_books(
 
     if q:
         qn = normalize(q)
+        q_is_num = q.strip().lstrip("0").isdigit()
         results = [b for b in results
                    if qn in normalize(b["title"])
-                   or qn in normalize(b.get("author", ""))]
+                   or qn in normalize(b.get("author", ""))
+                   or (q_is_num and b.get("exl_no") == int(q.strip()))]
     if section:
         results = [b for b in results if b.get("section") == section]
     if age:
